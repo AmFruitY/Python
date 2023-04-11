@@ -1,0 +1,23 @@
+# Necessary Packages
+
+# Basics 
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Skimage
+
+from skimage import data          # let us add default images
+from skimage import metrics       # we used this to see the similarity of two images
+from skimage import measure       # i think this is not a working command anymore
+
+from skimage.filters import threshold_otsu  # this is used for 
+
+# Scipy 
+
+from scipy import signal          # we used this for thresholding, another way of thresholding
+
+
+
+# T2 important tips
+
