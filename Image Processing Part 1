@@ -19,5 +19,50 @@ from scipy import signal          # we used this for thresholding, another way o
 
 
 
-# T2 important tips
+# T2 Concepts
 
+R = im[:,:,0]     # Getting the separate channels
+G = im[:,:,1]     # We can represent this channels at the gl using cmap = 'gray'
+B = im[:,:,2]
+
+a0 = np.zeros([norow, nocol, 3], dtype = np.uint8)      # If we want to represent only the red part being red, we need to isolate the red channel and
+R_only = np.copy(a0)                                    # insert it to a matrix with only information in the red channel
+R_only[:,:,0] = np.copy(R)
+
+plt.imshow(R, cmap ='gray')                   # We represent both images respectively.
+plt.imshow(R_only)
+
+
+avg = 0.333 * (np.double(retina_imageR )+ np.double(retina_imageG) + np.double(retina_imageB))          # Average and Luminance
+L = 0.299*np.double(retina_imageR) + 0.587*np.double(retina_imageG) + 0.114*np.double(retina_imageB)    # Luminance is the brightness perceived by the eye = GL
+
+# There is a noticeable difference in the avg when we don't use the float version.
+# Both variables are represented as 1 channel with the cmap ='gray'.
+
+
+im = np.uint8(255 * (im/255)**gamma)          # Gamma correction; Gamma can be between 0 to 1 or greater than 1
+im = np.uint8 (255 * (1-(im/255)))            # Contrast inversion; I think the 255 in my original code should be 1 since the image is normalized
+im = np.uint8 (255 * (m*(im/255) + n))        # Linear; m and n are selected by the user
+im = np.uint8 (255 * (im_max/(1 + np.exp(-k*((im/255)-im_min))))) # Logisitic; where the maximum and minimum values of the image are used
+
+im [im >= x] = 1                              # Binarization
+im [im != y] = 0
+
+
+ssim = metrics.structural_similarity(im[:,:,0], L)    # Measure the structural similarity of two images: It has to be the same dimensions
+MSE = ((im[:,:,0] - L)**2).sum() / im[:,:,0].size     # Measure the Mean Square Error: The average square difference between the estimated values and the actual value
+
+
+# T3 Concepts
+
+th = np.uint8(threshold_otsu(L))/255                  # Global Thresholding: We select the optimal threshold using the command.
+gth = np.uint8(L>=th)                                 * No entiendo los uint de aquí
+
+th = signal.medfilt(L, kernel_size=N)                 # Median Thresholding: We select the median threshold in NxN masks.
+mth = L>=th
+
+domain = np.identity(N)                               # Order Filter: We select the threshold by masking a NxN identity mask, selecting the m-least number
+th = signal.order_filter(L, domain, m)
+oth = L>=th
+
+Note: Global thresholding aren't generally useful since morst images are illuminated unequally. It is preferred to use adaptive thresholding like the median or the order filter.
