@@ -1,22 +1,32 @@
 # Necessary Packages
 
-# Basics 
+# Numpy
 
 import numpy as np
+
+# Matplotlib
+
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg  # used to load up .png images
 
 # Skimage
 
 from skimage import data          # let us add default images
 from skimage import metrics       # we used this to see the similarity of two images
 from skimage import measure       # i think this is not a working command anymore
+from skimage import color         # we use this to convert from rgb to hsv and vice versa
 
 from skimage.filters import threshold_otsu  # this is used for 
 
 # Scipy 
 
 from scipy import signal          # we used this for thresholding, another way of thresholding
+from scipy import integrate       # integrating knowing the discrete values of the function we want to integrate
+from scipy import ndimage         #
 
+# Misc
+
+file = np.load('file.npy')
 
 
 # T2 Concepts
@@ -66,3 +76,101 @@ th = signal.order_filter(L, domain, m)
 oth = L>=th
 
 Note: Global thresholding aren't generally useful since morst images are illuminated unequally. It is preferred to use adaptive thresholding like the median or the order filter.
+
+
+# T4 Concepts
+
+
+# 4.1 RGB coordinates from a spectrum data. RGB coordinates to CIE.
+
+x = integrate.simps(Ewl*xwl, wl)              # We first integrate to get the color matching functions.
+X = x/(x+y+z)                                 # We normalize these functions, we obtain the CIE 19311 XYZ color space.
+
+mlr = 255*np.array([[3.240479, -1.537150, -0.498535],       # The RGB and CIE coordinates are related this linear relationship.
+               [-0.969256, 1.875992, 0.041556],
+               [0.055648, -0.204043, 1.057311]])
+RGB = np.uint8(mlr@mXYZ)
+R = RGB[0] * np.uint8(np.ones([500, 500]))
+RGB = np.stack((R,G,B), axis = -1)
+
+# 4.2 YCbCr color model. Chroma Sampling.
+
+# 4.3 HSV color space.
+
+def RGBtoHSV (imRGB):              # function used to convert an RGB image to a HSV
+    
+    R = imRGB[:,:,0]
+    G = imRGB[:,:,1]
+    B = imRGB[:,:,2]
+    
+    V = np.maximum.reduce([imRGB[:,:,0], imRGB[:,:,1], imRGB[:,:,2]])
+    m = np.minimum.reduce([imRGB[:,:,0], imRGB[:,:,1], imRGB[:,:,2]])
+    C = V - m
+    
+    # We calculate H
+    
+    mask1 = C == 0 # boolean masks where the condition is true
+    mask2 = V == R 
+    mask3 = V == G
+    mask4 = V == B
+    
+    H_ = np.ones_like(C) # creates an array with the same dimensions
+    
+    H_[mask1] = 0 # sets the element in which the condition is true to the corresponding value
+    H_[mask2] = ((G[mask2] - B[mask2])/C[mask2])/6 
+    H_[mask3] = ((B[mask3] - R[mask3])/C[mask3]) + 2
+    H_[mask4] = ((R[mask4] - G[mask4])/C[mask4]) + 4
+    
+    H = H_/6
+    
+    # Calculate S
+    
+    mask5 = V == 0
+    mask6 = V != 0
+    
+    S = np.ones_like(C)
+
+    S[mask5] = 0
+    S[mask6] = C[mask6]/V[mask6]
+    
+    return np.stack((H,S,V), axis = -1)
+    
+    
+ def HSVtoRGB(imHSV):                 # function to convert HSV to RGB
+    
+    # First, we have to slice the image into the channels it is composed of    
+    H = imHSV[:,:,0]
+    S = imHSV[:,:,1] 
+    V = imHSV[:,:,2] 
+    
+    # We calculate the different k constants
+    kR = (5 + 6*H)%6
+    kG = (3 + 6*H)%6
+    kB = (1 + 6*H)%6
+    
+    zeromx = np.zeros_like(kR) # We create these matrices to facilitate our operations
+    onemx = np.ones_like(kR)
+    
+    # We calculate each level, taking into acount that we have to operate element-wise
+    R = V - np.multiply(np.multiply(V,S), np.maximum.reduce([zeromx, np.minimum.reduce([kR, 4-kR, onemx])]))
+    G = V - np.multiply(np.multiply(V,S), np.maximum.reduce([zeromx, np.minimum.reduce([kG, 4-kG, onemx])]))
+    B = V - np.multiply(np.multiply(V,S), np.maximum.reduce([zeromx, np.minimum.reduce([kB, 4-kB, onemx])]))
+    
+    return np.stack((R, G, B), axis = -1) # We clump it all back together
+    
+# the following are functions to convert images directly to the wanted color model
+color.rgb2hsv(imRGB)
+color.hsv2rgb(imHSV)
+
+
+# 4.4 Histogram and Equalization.
+
+# To analize the histogram and equalize an image we must use its gray level image.
+
+histogram = ndimage.histogram(imgl, 0, 255, 256)      # This function calculates the histogram of an image; The argument bins can be referred to the number of 'digits' available
+cumulative_histogram = np.cumsum(histogram)           # Sums cumulatively.
+
+
+# To equalized the gray level image, we use the following formula. We proceed to do the same for the histogram and its cumulative histogram.
+eq = np.uint8((255 * ch[im])/(M*N))
+
