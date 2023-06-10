@@ -8,7 +8,25 @@ Image Fusion: Combining two images using a spatial filtering technique
 4. Superposition of convolved images by multiplying esch other.
 5. 4-cluster image using k-means.
 
+June 2020
+
+Inverse halftoning: Obtain gray level images from binary one
+- Dithering/ Error difusion binary images
+- Application of low-pass filter either in the spatial or frequency domain
+
+1. Gaussian filter: Application and display
+- (?) To what extent is the Gaussian filter useful in recovering the gray levels of a dithered image
+2. Pearson R Coefficient: Numpy (?)
+3. Extraction of edges
+
+Degree of Polarization
+
+1. (?) For loops
+2. Binary masks
+3. Total variation filter using skimage
+
 June 2019
+
 
 Hash functions 
 
@@ -25,4 +43,5 @@ Fórmula rarilla
 1. Understanding of the formula
 2. Entropy calculation. (Appropiate neighborhood)
 - Colorbar
-- Definition
+- Definition: quantifies the uncertainty or the average amount of information needed to represent the image pixels
+
