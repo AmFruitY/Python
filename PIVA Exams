@@ -1,3 +1,13 @@
+June 2021
+
+Image Fusion: Combining two images using a spatial filtering technique
+
+1. Luminance
+2. Convolution with a 7x7 ones-filter. Normalization.
+3. Convolution with a custom edge-enhancer filter.
+4. Superposition of convolved images by multiplying esch other.
+5. 4-cluster image using k-means.
+
 June 2019
 
 Hash functions 
@@ -7,3 +17,12 @@ Hash functions
 3. Binarization - 2 for loops
 4. Flattening array - np.ndarray.flatten()
 5. Hamming distance - Elementwise comparison
+
+Richardson-Lucy algorithm: Iterative method to restore defocused images affected by noise.
+
+Fórmula rarilla
+
+1. Understanding of the formula
+2. Entropy calculation. (Appropiate neighborhood)
+- Colorbar
+- Definition
