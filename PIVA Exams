@@ -45,3 +45,17 @@ Fórmula rarilla
 - Colorbar
 - Definition: quantifies the uncertainty or the average amount of information needed to represent the image pixels
 
+June 2018
+
+Colormap Jet
+
+1. 256x256 pixel: Every row is constant from 0-255 (meshgrid)
+2. RGBalfa (?)
+
+Chlamydomonas
+
+1. Noise filtering using convolution. Custom matrix.
+2. Noise filtering using Chambole method (skimage package)
+3. Entropy with cmap rainbow and colorbar
+- Interpret which one has a more efficient noise filtration
+4. Prewitt filter: Obtaining only edges
