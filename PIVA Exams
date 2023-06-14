@@ -55,7 +55,10 @@ Colormap Jet
 Chlamydomonas
 
 1. Noise filtering using convolution. Custom matrix.
+  - When colvoving, we usually use the 0 level image.
 2. Noise filtering using Chambole method (skimage package)
 3. Entropy with cmap rainbow and colorbar
-- Interpret which one has a more efficient noise filtration
+  - Entropy is a measure of image information content, which is interpreted as the average uncertainty of information source.
+  - Entropy calculation with the correct package
+  - The better filtered image is the one that shows the details a lot more, it is more red in the important areas
 4. Prewitt filter: Obtaining only edges
