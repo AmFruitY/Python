@@ -1,0 +1,100 @@
+# -*- coding: utf-8 -*-
+"""
+Spyder Editor
+
+This is a temporary script file.
+"""
+
+#%% Lab #8 Mathematical morphology, distance and watershed transforms: Segmentations.
+
+#%% Libraries
+
+import numpy as np
+
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
+from scipy import ndimage
+from scipy import signal
+
+from skimage import feature
+from skimage import measure
+from skimage import morphology
+from skimage import segmentation
+
+#%% 8.1 Morphology to the rescue.
+
+
+im = mpimg.imread('obvvX.jpg')
+imL = 0.299*im[:500,500:,0] + 0.587*im[:500,500:,1] + 0.114*im[:500,500:,2]
+
+# Best thresholding technique?
+
+th = 67
+
+imB = np.double(imL<th)
+imBl = imL < th
+
+# imM = ndimage.binary_erosion(imB, iterations=1, structure = np.ones((3,3)))
+# imM = ndimage.binary_dilation(imM, iterations=1, structure = np.ones((3,3)))
+# imM = ndimage.binary_dilation(imM, iterations=1, structure = np.ones((3,3)))
+# imM = ndimage.binary_erosion(imM, iterations=1, structure = np.ones((3,3)))
+
+imM = morphology.closing(imB) # Closing first gets rids of the small holes
+imM = morphology.opening(imB) # The result in this order is far better than if we do it the other way around
+
+
+# imM = morphology.remove_small_objects(imBl)
+# imM = morphology.remove_small_holes(imM)
+
+# Label
+iml = measure.label(imM, connectivity = 2)
+
+# Distance Transform
+imDT = ndimage.distance_transform_edt(imB)
+
+# Watershed Transform
+
+# wmax = feature.peak_local_max(imDT, footprint=np.ones((3, 3)), labels=imBl) # Index = False?
+# label_max = ndimage.label(wmax) 
+# imWT = segmentation.watershed(imDT, markers = label_max[0], connectivity = 2, mask = imBl, watershed_line=True) # mask=
+
+segmentation.watershed
+
+plt.figure(1)
+
+plt.subplot(231)
+plt.title('OG GL')
+plt.imshow(imL, cmap = 'gray')
+plt.subplot(232)
+plt.title('Binarized')
+plt.imshow(imB, cmap = 'gray')
+plt.subplot(233)
+plt.title('After Morphology')
+plt.imshow(imM, cmap = 'gray')
+plt.subplot(234)
+plt.title('Labelled Image')
+plt.imshow(iml, cmap = 'gray')
+plt.subplot(235)
+plt.title('Distance Transform')
+plt.imshow(imDT)
+# plt.subplot(236)
+# plt.title('Watershed Transform')
+# plt.imshow(imWT)
+
+plt.tight_layout()
+
+# im2 = mpimg.imread('800px-Target_cells_and_spherocytes.jpg')
+# im2L = 0.299*im2[:,:,0] + 0.587*im2[:,:,1] + 0.114*im2[:,:,2]
+
+# th2 = signal.medfilt(im2L, 5)
+
+# im2B = np.double(im2L<th2)
+
+
+# plt.figure(2)
+
+# plt.subplot(231)
+# plt.imshow(im2L, cmap = 'gray')
+# plt.subplot(232)
+# plt.imshow(im2B, cmap = 'gray')
