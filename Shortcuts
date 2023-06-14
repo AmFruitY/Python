@@ -10,3 +10,26 @@ def L(im):
     L = 0.299*np.double(imR) + 0.587*np.double(imG) + 0.114*np.double(imB)
     
     return L
+    
+Entropy
+
+def loc_entropy(im,hood):
+    
+    shape = np.shape(im)
+    s = int((hood-1)/2)
+    entr = np.zeros(shape)
+    
+    for i in range(s,shape[0]-s):
+        for j in range(s,shape[1]-s):
+            h = sp.histogram(im[i-s:i+s+1,j-s:j+s+1],0,255,256)
+            S = 0
+            for freq in h:
+                p = freq/hood**2
+                S -= p*np.log2(p+ 10**-15)
+            entr[i,j] = S
+    return entr
+
+skimage.filters.rank.entropy(image, footprint, ...)
+
+    - image has to be uint8, uint16
+    - footprint or hood has to be 0s or 1s
