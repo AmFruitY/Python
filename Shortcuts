@@ -1,1 +1,12 @@
 
+Luminance Function
+
+def L(im):
+    
+    imR = im[:,:,0]
+    imG = im[:,:,1]
+    imB = im[:,:,2]
+    
+    L = 0.299*np.double(imR) + 0.587*np.double(imG) + 0.114*np.double(imB)
+    
+    return L
