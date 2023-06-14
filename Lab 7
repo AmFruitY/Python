@@ -1,0 +1,160 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Apr 21 11:53:02 2023
+
+@author: fis.aules
+"""
+
+# Lab 7: K-means clustering
+# Joshua Santuyo Lorenzana
+
+#%% Libraries
+
+import numpy as np
+
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+from skimage import color
+from skimage import metrics
+from skimage import data
+
+from sklearn import cluster
+from sklearn import utils
+
+#%% Images
+
+irc = mpimg.imread('aeroport_irc.jpg')
+rgb = mpimg.imread('aeroport_rgb.jpg')
+
+im = np.stack([rgb[:,:,0], rgb[:,:,1], rgb[:,:,2], irc[:,:,0]], axis =-1)
+
+#%% 7.1 Clustering of aerial images
+
+# reshaping the image
+
+def flatten(img):
+    
+    imgR = img[:,:,0]
+    imgG = img[:,:,1]
+    imgB = img[:,:,2]
+    imgI = img[:,:,3]
+    
+    # flattening and putting into rows
+    
+    img_K = np.stack([imgR.flatten(), imgG.flatten(), imgB.flatten(), imgI.flatten()], axis =-1)
+    
+    return img_K
+
+im_K = flatten(im)
+# system training
+
+im_KMN = cluster.KMeans(n_clusters = 5, init = 'k-means++', random_state = 0).fit(im_K)
+
+#%% Let's create a new cell just to not use fit again, as it is time-consuming
+
+# # labels
+
+# labels_im = im_KMN.predict(im_K)
+
+# # centroids
+
+# centroids_im = im_KMN.cluster_centers_
+
+# # from 1d-array to 2d-array
+# imRes =np.reshape(labels_im, [250, 500])
+
+# # Representing
+
+# plt.figure(1)
+# plt.imshow(imRes)
+
+# # Producing the scatterplot for the coordinates
+
+# plt.figure(2)
+
+# plt.subplot(2, 3, 1)
+# plt.title('R vs G')
+# plt.scatter(im_K[:,0], im_K[:,1], c = labels_im , cmap='jet')
+
+# plt.subplot(2, 3, 2)
+# plt.title('R vs B')
+# plt.scatter(im_K[:,0], im_K[:,2], c = labels_im , cmap='jet')
+
+# plt.subplot(2, 3, 3)
+# plt.title('R vs IR')
+# plt.scatter(im_K[:,0], im_K[:,3], c = labels_im , cmap='jet')
+
+# plt.subplot(2, 3, 4)
+# plt.title('G vs B')
+# plt.scatter(im_K[:,1], im_K[:,2], c = labels_im , cmap='jet')
+
+# plt.subplot(2, 3, 5)
+# plt.title('G vs I')
+# plt.scatter(im_K[:,1], im_K[:,3], c = labels_im , cmap='jet')
+
+# plt.subplot(2, 3, 6)
+# plt.title('B vs I')
+# plt.scatter(im_K[:,2], im_K[:,3], c = labels_im , cmap='jet')
+
+# plt.tight_layout()
+
+#%% 7.2 Revisitng indexed color
+
+# for this exercise, we'll be using the astronaut image
+
+im2 = data.astronaut()
+
+imgR = im2[:,:,0]
+imgG = im2[:,:,1]
+imgB = im2[:,:,2]
+    
+# flattening and putting into rows
+    
+im2_K = np.stack([imgR.flatten(), imgG.flatten(), imgB.flatten()], axis =-1)
+
+# reducing the number of levels to 215
+
+im2_rdc = 5 * np.uint8(im2_K/6)
+
+# plt.figure(3)
+# plt.subplot(1,2,1)
+# plt.title('Reduced to 216-level')
+# plt.imshow(im_rdc)
+# plt.subplot(1,2,2)
+# plt.title('OG image')
+# plt.imshow(im)
+
+# plt.tight_layout()
+
+# # Image Comparison
+
+# ssim = metrics.structural_similarity(im_rdc, im2, multichannel='True')
+
+# # ??? win_size exceeds image extent.  If the input is a multichannel (color) image, set multichannel=True 
+# print (' The reduced 216-level image and the original image has a similarity of about ' + str(ssim) + '.')
+
+# K-means the reduced image
+# system training
+
+# efficiency
+
+target = utils.shuffle(im2_rdc, random_state = 0)
+im2_rdc_KMN = cluster.KMeans(n_clusters = 216, init = 'k-means++', random_state = 0).fit(im2_K)
+
+#%%
+labels_im2_rdc = im2_rdc_KMN.predict(im2_K)
+centroids_im2_rdc = im2_rdc_KMN.cluster_centers_
+im2_rdc_res = np.reshape(labels_im2_rdc, [512,512])
+
+plt.figure(4)
+plt.subplot(1,2,1)
+plt.title('K-means processed image')
+plt.imshow(im2_rdc_res)
+
+# new index
+index = np.linspace(0, 215, 216, dtype=np.uint8)
+lut =np.uint8(centroids_im2_rdc[index])
+
+plt.subplot(1,2,2)
+plt.title('Color indexed image using the centroids of the clusters')
+plt.imshow(lut[im2_rdc_res])
