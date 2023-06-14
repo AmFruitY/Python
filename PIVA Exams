@@ -56,7 +56,7 @@ Chlamydomonas
 
 1. Noise filtering using convolution. Custom matrix.
   - When colvoving, we usually use the 0 level image.
-2. Noise filtering using Chambole method (skimage package)
+2. Noise filtering using Chambole method (skimage package witht the correct parameters, weight=0.3, eps=0.0002) 
 3. Entropy with cmap rainbow and colorbar
   - Entropy is a measure of image information content, which is interpreted as the average uncertainty of information source.
   - Entropy calculation with the correct package
