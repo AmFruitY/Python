@@ -1,0 +1,68 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Mar 15 18:50:19 2023
+
+@author: joshu
+"""
+
+#%% Lab 3: Image binarization. Dithering.
+
+#%% Libraries
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+from skimage import data 
+from scipy import signal
+from skimage.filters import threshold_otsu
+
+#%% 3.1 Adaptive Thresholding
+
+im = data.retina()
+
+# We have to calculate the Luminance to be able to display the gray level image.
+
+L = 0.299*np.double(im[:,:,0]) + 0.587*np.double(im[:,:,1]) + 0.114*np.double(im[:,:,2])
+
+
+plt.figure('3.1')
+plt.suptitle('3.1 Adaptive Thresholding')
+
+plt.subplot(2, 2, 1)
+plt.title('Original')
+plt.imshow(L, cmap = 'gray')
+
+# Global Thresholding
+
+# Selecting the optimal threshold using the following command
+
+th = np.uint8(threshold_otsu(L))/255
+L_gth = np.uint8(L>=th)
+
+plt.subplot(2,2,2)
+plt.title('Global Thresholding')
+plt.imshow(L_gth, cmap = 'gray')
+
+# Median Thresholding
+
+
+L_mth = signal.medfilt(L, kernel_size=3)
+
+L_mf = L>=L_mth
+
+plt.subplot(2,2,3)
+plt.title('Median Thresholding')
+plt.imshow(L_mf, cmap = 'gray')
+
+# Order Filter
+
+domain = np.identity(3)
+
+L_oth = signal.order_filter(L, domain, 2)
+L_of = L>=L_oth
+
+plt.subplot(2,2,4)
+plt.title('Median Thresholding: Diff domain')
+plt.imshow(L_of, cmap = 'gray')
+
+plt.tight_layout()
