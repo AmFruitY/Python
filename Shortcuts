@@ -47,3 +47,24 @@ prey = np.array([[1, 1, 1], [0, 0, 0], [-1, -1, -1]], dtype=np.double)
 impre = np.sqrt(ndimage.filters.convolve(im, prex)**2 + ndimage.filters.convolve(im, prey)**2)
 imcannypre = np.sqrt(ndimage.filters.convolve(imcanny, prex)**2 + ndimage.filters.convolve(imcanny, prey)**2)
 imchambolepre = np.sqrt(ndimage.filters.convolve(imchambole, prex)**2 + ndimage.filters.convolve(imchambole, prey)**2)
+
+Erosion: ndimage.binary_erosion(imB, iterations=1, structure = np.ones((3,3)))	 
+The value of the output pixel is the minimum value of all pixels in the neighborhood. In a binary image, a pixel is set to 0 if any of the neighboring pixels have the value 0.
+Morphological erosion removes floating pixels and thin lines so that only substantive objects remain. Remaining lines appear thinner and shapes appear smaller.
+Dilation: ndimage.binary_dilation(imM, iterations=1, structure = np.ones((3,3)))
+The value of the output pixel is the maximum value of all pixels in the neighborhood. In a binary image, a pixel is set to 1 if any of the neighboring pixels have the value 1.
+Morphological dilation makes objects more visible and fills in small holes in objects. Lines appear thicker, and filled shapes appear larger.
+Opening: morphology.opening(imB), morphology.remove_small_objects(imBl)
+Dilation of the erosion. Remove bright objects.
+Closing:  morphology.closing(imB), morphology.remove_small_holes(imM)
+Erosion of the dilation. Remove small holes.
+
+
+Binarization
+
+Label: iml = measure.label(imM, connectivity = 2)
+Distance Transform: imDT = ndimage.distance_transform_edt(imB)
+Watershed Transform
+wmax = feature.peak_local_max(imDT, footprint=np.ones((3, 3)), labels=imBl) # Index = False?
+label_max = ndimage.label(wmax) 
+imWT = segmentation.watershed(imDT, markers = label_max[0], connectivity = 2, mask = imBl, watershed_line=True)
