@@ -1,0 +1,230 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Mar 11 13:54:31 2023
+
+@author: joshu
+"""
+
+#%% Lab 2: Basic image manipulation: channel processing, colormaps, LUTS
+
+import numpy as np
+import matplotlib.pyplot as plt
+from skimage import data
+from skimage import metrics
+from skimage import measure
+
+
+#%% 2.1 Channel Extraction
+
+retina_image = data.retina()
+
+# To check whether it's 8 bits or 24 bits, we will have a look at the max value
+
+max_value = np.max(retina_image)
+
+print('Since the ' + str (max_value) + ' is the maximum value of the image, we therefore '
+      + 'conclude that it is an 8 bit image.')
+
+no_col = retina_image.shape[0]
+no_row = retina_image.shape[1]
+
+print('The size of the image is ' + str(no_row) + 'x' + str(no_col) + '.')
+
+# Representing the gray level image of the different channels
+
+retina_imageR = retina_image[:,:,0]
+retina_imageG = retina_image[:,:,1]
+retina_imageB = retina_image[:,:,2]
+
+plt.figure(1)
+
+plt.subplot(2, 3, 1)
+plt.title('R Channel')
+plt.imshow(retina_imageR, cmap = 'gray')
+
+plt.subplot(2, 3, 2)
+plt.title('G Channel')
+plt.imshow(retina_imageG, cmap = 'gray')
+
+plt.subplot(2, 3, 3)
+plt.title('B Channel')
+plt.imshow(retina_imageB, cmap = 'gray')
+
+# Now, we have to display the different channels but with their respective colours.
+
+a_0 = np.zeros([no_row, no_col, 3], dtype = np.uint8)
+
+# We have to be careful with the number type because imshow only use uint8, normalized numbers over 255,
+# or a number between 0,1 if its a float.
+
+retina_imageRR = np.copy(a_0)
+retina_imageGG = np.copy(a_0)
+retina_imageBB = np.copy(a_0)
+
+retina_imageRR[:,:,0] = np.copy(retina_imageR)
+retina_imageGG[:,:,1] = np.copy(retina_imageG)
+retina_imageBB[:,:,2] = np.copy(retina_imageB)
+
+plt.subplot(2, 3, 4)
+plt.title('R Channel')
+plt.imshow(retina_imageRR)
+
+plt.subplot(2, 3, 5)
+plt.title('G Channel')
+plt.imshow(retina_imageGG)
+
+plt.subplot(2, 3, 6)
+plt.title('B Channel')
+plt.imshow(retina_imageBB)
+
+plt.tight_layout()
+
+#%% Lightness, colormaps and false color,and look up tables (LUTS)
+
+
+# Average 
+avg = 0.333 * (np.double(retina_imageR )+ np.double(retina_imageG) + np.double(retina_imageB))
+avg2 = 0.333 * (retina_imageR+ retina_imageG + retina_imageB)
+
+plt.figure(2)
+
+plt.subplot(2, 2, 1)
+plt.title('Average (float)')
+plt.imshow(avg, cmap = 'gray')
+
+plt.subplot (2,2, 3)
+plt.title('Average (8 bit)')
+plt.imshow(avg2, cmap = 'gray')
+
+# Luma: luma represents the brightness in an image
+
+L = 0.299*np.double(retina_imageR) + 0.587*np.double(retina_imageG) + 0.114*np.double(retina_imageB)
+L2 = 0.299*retina_imageR + 0.587*retina_imageG + 0.114*retina_imageB
+
+plt.subplot (2,2, 2)
+plt.title('Luminance (float)')
+plt.imshow(L, cmap = 'gray')
+
+plt.subplot (2,2, 4)
+plt.title('Luminance (8 bit)')
+plt.imshow(L2, cmap = 'gray')
+
+plt.tight_layout()
+
+# As we can see, we can have a problem if we calculate the average, whether it overpasses 255 or not
+# On the other hand, we can see that both images of the luminance are the same, therefore
+# we will never have a number passing 255
+
+#%% LUTs
+
+im_cell = data.cell()
+
+# Since we are using a new image, let's see what it is first.
+
+plt.figure('Cell')
+plt.imshow(im_cell)
+
+gamma = 0.5
+im_cellg = np.uint8(255 * (im_cell/255)**gamma)
+
+gamma2 = 1.3
+im_cellg2 = np.uint8(255 * (im_cell/255)**gamma2)
+
+# We have to normalize it first then turn it back to 8 bit for the imshow.
+
+plt.figure('Gamma Corrected')
+plt.suptitle ('Gamma LUT')
+
+plt.subplot(1, 2, 1)
+plt.title(r'1> $\gamma$ > 0')
+plt.imshow(im_cellg)
+
+plt.subplot(1, 2, 2)
+plt.title(r'$\gamma$ > 1')
+plt.imshow(im_cellg2)
+
+# The one where gamma is bigger than 1, is not corrected.*
+
+# Contrast Inversion
+
+im_cellci = np.uint8 (255 * (1-(im_cell/255)))
+
+plt.figure('LUTs')
+plt.suptitle('Look Up Tables')
+
+plt.subplot(2, 2, 1)
+plt.title('Color Inversion')
+plt.imshow(im_cellci)
+
+# Linear
+
+m = 30
+n = 5
+
+im_celll = np.uint8 (255 * (m*(im_cell/255) + n))
+
+plt.subplot(2, 2, 2)
+plt.title('Linear')
+plt.imshow(im_celll)
+
+# Logistic
+
+gl_max = np.max(im_cell)
+gl_min = np.min(im_cell)
+k = 32
+
+im_celllog = np.uint8 (255 * (gl_max/(1 + np.exp(-k*((im_cell/255)-gl_min)))))
+
+plt.subplot(2, 2, 3)
+plt.title('Logistic')
+plt.imshow(im_celllog)
+
+# Binarization
+
+im_cell_copy = np.copy(im_cell)
+
+im_cell_copy [im_cell_copy >= 43] = 1
+im_cell_copy [im_cell_copy != 1] = 0
+
+plt.subplot (2,2,4)
+plt.title('Binarization')
+plt.imshow(im_cell)
+
+plt.tight_layout()
+
+#%% Structural Similarity and Mean Square
+
+# I don't know which I should compare to
+ssimR = metrics.structural_similarity(retina_image[:,:,0], L)
+ssimG = metrics.structural_similarity(retina_image[:,:,1], L)
+ssimB = metrics.structural_similarity(retina_image[:,:,2], L)
+
+print (ssimR)
+print (ssimG)
+print (ssimB)
+
+# # What does it mean to be normalized?
+
+# ssimRR = measure.compare_ssim(retina_image[:,:,0], L)
+# ssimGG = measure.compare_ssim(retina_image[:,:,1], L)
+# ssimBB = measure.compare_ssim(retina_image[:,:,2], L)
+
+# print (ssimRR)
+# print (ssimGG)
+# print (ssimBB)
+ 
+# Does this not exist anymore?
+
+# What does the MSE really mean? 
+# an estimator (of a procedure for estimating an unobserved quantity) measures the average of 
+# the squares of the errors—that is, the average squared difference between the estimated values and the actual value.
+
+MSER = ((retina_image[:,:,0] - L)**2).sum() / retina_image[:,:,0].size
+MSEG = ((retina_image[:,:,1] - L)**2).sum() / retina_image[:,:,1].size
+MSEB = ((retina_image[:,:,2] - L)**2).sum() / retina_image[:,:,2].size
+
+print(MSER)
+print(MSEG)
+print(MSEB)
+
+# Why are they too big? when the ssim is almost 1.
