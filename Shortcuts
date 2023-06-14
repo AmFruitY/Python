@@ -33,3 +33,17 @@ skimage.filters.rank.entropy(image, footprint, ...)
 
     - image has to be uint8, uint16
     - footprint or hood has to be 0s or 1s
+
+
+Prewitts' Filter
+
+im = np.double(im)
+imcanny = np.double(imcanny)
+imchambole = np.double(imchambole)
+
+prex = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]], dtype=np.double)
+prey = np.array([[1, 1, 1], [0, 0, 0], [-1, -1, -1]], dtype=np.double)
+
+impre = np.sqrt(ndimage.filters.convolve(im, prex)**2 + ndimage.filters.convolve(im, prey)**2)
+imcannypre = np.sqrt(ndimage.filters.convolve(imcanny, prex)**2 + ndimage.filters.convolve(imcanny, prey)**2)
+imchambolepre = np.sqrt(ndimage.filters.convolve(imchambole, prex)**2 + ndimage.filters.convolve(imchambole, prey)**2)
