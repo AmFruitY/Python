@@ -1,3 +1,12 @@
+September 2021
+
+Census Transform
+
+1. From the definition, write the code to execute the transformation.
+2. Hamming distance: # of times the pixel are not the same
+
+Inverse Halftoning: Same as June 2020
+
 June 2021
 
 Image Fusion: Combining two images using a spatial filtering technique
@@ -15,15 +24,19 @@ Inverse halftoning: Obtain gray level images from binary one
 - Application of low-pass filter either in the spatial or frequency domain
 
 1. Gaussian filter: Application and display
-- (?) To what extent is the Gaussian filter useful in recovering the gray levels of a dithered image
+  - Meshgrid correct sizes and values
+  - FFTs
+  - To what extent is the Gaussian filter useful in recovering the gray levels of a dithered image
+    - Pretty nice, if we look at the graph it matches well. Depending on the sigma chosen.
 2. Pearson R Coefficient: Numpy (?)
-3. Extraction of edges
+3. Extraction of edges: Prewitt's Filter
 
 Degree of Polarization
 
-1. (?) For loops
+1. Illumination independet DoP distribution: Use of For loops
 2. Binary masks
 3. Total variation filter using skimage
+4. Display using colorbar, shrink the colorbar!
 
 June 2019
 
@@ -36,21 +49,14 @@ Hash functions
 4. Flattening array - np.ndarray.flatten()
 5. Hamming distance - Elementwise comparison
 
-Richardson-Lucy algorithm: Iterative method to restore defocused images affected by noise.
-
-Fórmula rarilla
-
-1. Understanding of the formula
-2. Entropy calculation. (Appropiate neighborhood)
-- Colorbar
-- Definition: quantifies the uncertainty or the average amount of information needed to represent the image pixels
 
 June 2018
 
 Colormap Jet
 
-1. 256x256 pixel: Every row is constant from 0-255 (meshgrid)
-2. RGBalfa (?)
+1. Meshgrid to obtain the image. 
+2. Application of a cmap to an image using cm by matplotlib.pyplot
+2. RGBalfa (the application of the cm gives a 4 channel array)
 
 Chlamydomonas
 
